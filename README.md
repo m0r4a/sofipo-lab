@@ -183,9 +183,14 @@ Y obvio, los de base: `\d` lista objetos, `\dt` tablas, `\d+ core.credito` una t
 
 ## Escala
 
-El tamaño lo controla `SCALE` en `.env` (por defecto 1). Con `SCALE=1` el conjunto completo con índices ocupa ~1.1 GB y se genera en ~1 minuto. `SCALE=2` y `SCALE=3` multiplican las tablas grandes. El seed **aborta** si `SCALE` supera `SCALE_MAX` (por defecto 3), como red de seguridad para no llenar el disco.
+El tamaño lo controla `SCALE` en `.env` (por defecto 1). Con `SCALE=1` el conjunto completo con índices ocupa ~1.1 GB y se genera en ~1 minuto. Las cardinalidades son ~lineales en `SCALE`, así que el disco crece parejo: `SCALE=3` ≈ 3.3 GB, `SCALE=5` ≈ 5.5 GB. El seed **aborta** si `SCALE` supera `SCALE_MAX` (por defecto 3), como red de seguridad para no llenar el disco.
 
-Personalmente me parece interesante hacer una escala más grande, ya que ahí sí se nota la diferencia en rendimiento, pero lo dejo a discreción de cada quién.
+Los recursos de Docker **escalan solos con `SCALE`** (los calcula `just up`), así no fallan las consultas paralelas en escalas grandes:
+
+- `shm_size` = `256MB × SCALE`. Postgres usa `/dev/shm` para los segmentos de memoria compartida de las consultas paralelas (Parallel Hash Join, etc.). El default de Docker (64 MB) se queda corto al calcular los hashes esperados con `SCALE≥3` y truena con `could not resize shared memory segment ... No space left on device`.
+- `mem_limit` = `max(2G, 1536MB + 256MB × SCALE)`. Sube en paralelo porque el tmpfs de `/dev/shm` cuenta contra el límite de memoria del contenedor.
+
+Puedes fijar ambos a mano con `SHM_SIZE` / `MEM_LIMIT` en `.env` si quieres otros valores. Personalmente me parece interesante hacer una escala más grande, ya que ahí sí se nota la diferencia en rendimiento, pero lo dejo a discreción de cada quién.
 
 ## Determinismo y reproducibilidad
 

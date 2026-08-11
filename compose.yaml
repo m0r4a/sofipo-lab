@@ -31,6 +31,9 @@ services:
       - config_file=/etc/postgresql/postgresql.conf
     ports:
       - "${HOST_PORT:-5433}:5432"
+    # /dev/shm para los segmentos DSM de consultas paralelas. El default de Docker
+    # (64MB) truena con SCALE>=3. El justfile calcula SHM_SIZE desde SCALE.
+    shm_size: ${SHM_SIZE:-256mb}
     volumes:
       - ./config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
       # Se monta sql/ (en solo lectura) para que `just psql` encuentre el /sql/.psqlrc.
@@ -51,7 +54,8 @@ services:
       resources:
         limits:
           cpus: "2.0"
-          memory: 2G
+          # /dev/shm cuenta contra este límite, sube junto con SCALE (justfile).
+          memory: ${MEM_LIMIT:-2G}
 
 volumes:
   pgdata:

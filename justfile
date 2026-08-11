@@ -29,7 +29,17 @@ default:
     @echo "Variables: SCALE={{scale}} (tope {{scale_max}}), HOST_PORT={{host_port}}, PGDATA_MODE={{pgdata_mode}}"
 
 # Levanta el contenedor y espera a que la db esté lista.
+# shm_size y mem_limit escalan con SCALE (o fíjalos en .env con SHM_SIZE/MEM_LIMIT).
 up:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    shm_mb=$(( 256 * {{scale}} ))
+    mem_mb=$(( 1536 + 256 * {{scale}} ))
+    if [ "$mem_mb" -lt 2048 ]; then mem_mb=2048; fi
+    : "${SHM_SIZE:=${shm_mb}m}"
+    : "${MEM_LIMIT:=${mem_mb}m}"
+    export SHM_SIZE MEM_LIMIT
+    echo ">> Recursos para SCALE={{scale}}: shm_size=${SHM_SIZE}, mem_limit=${MEM_LIMIT}"
     {{compose}} up -d
     POSTGRES_USER={{postgres_user}} POSTGRES_DB={{postgres_db}} bash scripts/esperar-db.sh {{container}}
 
