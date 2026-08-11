@@ -65,7 +65,7 @@ Para reconstruir todo desde cero en cualquier momento: `just reset`.
 
 El ciclo de resolver un ejercicio desde la CLI se ve masomenos así:
 
-1. **Mira cuál toca.** `just siguiente` te da el próximo ejercicio sin resolver. `just enunciado E05` muestra el enunciado completo y las columnas que debe devolver tu consulta.
+1. **Mira cuál ejercicio sigue.** `just siguiente` te da el próximo ejercicio sin resolver. `just enunciado E05` muestra el enunciado completo y las columnas que debe devolver tu consulta.
 
 2. **Entiende el vocabulario.** Si un término de negocio no te suena (mora, cartera vencida, cosecha, partida doble...), `just glosario <término>` te lo explica sin salir de la terminal. Sin argumento, `just glosario` lista todos los términos.
 
@@ -102,11 +102,11 @@ El motor compara tu resultado con el esperado convirtiendo cada fila a texto y s
 Ejemplo de una respuesta que falla **solo por formato** y su corrección:
 
 ```sql
--- Falla: el monto está sin redondear (más de 2 decimales) y columna mal nombrada
+-- Falla porque el monto está sin redondear (más de 2 decimales) y columna la columna está mal nombrada.
 SELECT producto_id, avg(monto_originado) AS promedio
 FROM core.credito GROUP BY producto_id;
 
--- Correcta: tipo y nombre según el contrato
+-- Esta es correcta ya que el tipo y nombre están según el contrato
 SELECT pc.codigo AS producto, avg(c.monto_originado)::numeric(18,2) AS ticket_promedio
 FROM core.credito c JOIN core.producto_credito pc ON pc.id = c.producto_id
 GROUP BY pc.codigo;
