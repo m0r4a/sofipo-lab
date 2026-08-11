@@ -75,7 +75,7 @@ El ciclo de resolver un ejercicio desde la CLI se ve masomenos así:
 
 5. **Verifica:**
    ```bash
-   just check E05
+   just check 05
    ```
 
    Respuestas posibles:
