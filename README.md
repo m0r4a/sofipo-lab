@@ -75,7 +75,7 @@ El ciclo de resolver un ejercicio desde la CLI se ve masomenos así:
 
 5. **Verifica:**
    ```bash
-   just check 05
+   just check E05
    ```
 
    Respuestas posibles:
@@ -86,6 +86,9 @@ El ciclo de resolver un ejercicio desde la CLI se ve masomenos así:
    - `✗ Error de SQL [42P01]: ...`: tu consulta no compiló, el mensaje dice por qué.
 
 > No siempre está mal usar emojis
+
+> [!NOTE]
+> Las respuestas deben escribirse tal cual se pone en el ejemplo, `E01`, `E02`...
 
 6. **Avanza.** `just progreso` muestra cuánto llevas por módulo.
 
