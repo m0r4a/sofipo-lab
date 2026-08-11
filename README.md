@@ -8,7 +8,7 @@ Lo armé para practicar y lo comparto por si le sirve a alguien más. Son 60 eje
 
 - [¿Qué es esto?](#qué-es-esto)
 - [Requisitos](#requisitos)
-- [Arranque rápido](#arranque-rápido)
+- [Quickstart](#quickstart)
 - [Cómo resolver un ejercicio](#cómo-resolver-un-ejercicio)
 - [El "contrato" de salida](#el-contrato-de-salida)
 - [Hay 9 módulos](#hay-9-módulos)
@@ -45,11 +45,11 @@ Cada ejercicio pide un resultado en lenguaje de negocio (no nombra la construcci
 
 
 > [!NOTE]
->No necesitas `psql` en tu máquina: todo corre dentro del contenedor.
+>No necesitas `psql` en tu máquina, todo corre dentro del contenedor.
 
 PostgreSQL 18 se expone en el puerto `5433` del host (configurable) para no chocar con un Postgres local en el `5432`.
 
-## Arranque rápido
+## Quickstart
 
 ```bash
 cp .env.example .env     # esta es configuración por defecto (puerto 5433, SCALE=1)
