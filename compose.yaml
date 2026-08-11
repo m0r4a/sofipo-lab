@@ -1,0 +1,58 @@
+# Laboratorio SQL simulando una sofipo, su único requisito en una db postgres
+#
+# Es compatible con `podman-compose`. Con podman, PGDATA_MODE=bind puede
+# dar menos problemas de permisos que el named volume
+#
+# La carga de datos NO inicia aquí, no se usa un /docker-entrypoint-initdb.d a
+# propósito, para poder recargar (con `just reset`) sin recrear el contenedor y para que
+# el seed sea explícito y medible desde el justfile.
+#
+# Puedes cambiar la persistencia de los datos (PGDATA_MODE en .env):
+#   volume (default): usa este archivo tal cual, named volume `sofipo_pgdata`.
+#   bind:            just añade `-f compose.bind.yaml`, que redirige los datos a
+#                    ./data/pgdata. Cambiar de modo exige `just nuke` antes.
+
+services:
+  db:
+    image: postgres:18.4-trixie
+    container_name: sofipo-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sofipo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sofipo}
+      POSTGRES_DB: ${POSTGRES_DB:-sofipo}
+      # Se fija el locale de initdb para que el ordenamiento de texto sea consistente
+      # entre máquinas: el orden de collation afecta string_agg y por tanto
+      # a los hashes (que se usan para ver si tu solución es correcta).
+      LANG: C
+      LC_COLLATE: C
+      LC_CTYPE: C
+    command:
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "${HOST_PORT:-5433}:5432"
+    volumes:
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      # Se monta sql/ (en solo lectura) para que `just psql` encuentre el /sql/.psqlrc.
+      # No es /docker-entrypoint-initdb.d, la carga usa el justfile a propósito.
+      - ./sql:/sql:ro
+      # El mount recomendado para Postgres 18 (en la imagen oficial) es /var/lib/postgresql (no /data).
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-sofipo} -d ${POSTGRES_DB:-sofipo}",
+        ]
+      interval: 5s
+      retries: 10
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+volumes:
+  pgdata:
+    name: sofipo_pgdata

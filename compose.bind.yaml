@@ -1,0 +1,12 @@
+# Override de persistencia para PGDATA_MODE=bind.
+# just añade este archivo (`-f compose.yaml -f compose.bind.yaml`) solo cuando
+# PGDATA_MODE=bind. Redirige el volumen `pgdata` a ./data/pgdata en el repo.
+# Esa carpeta está en .gitignore. Cambiar entre volume y bind requiere `just nuke`.
+volumes:
+  pgdata:
+    name: sofipo_pgdata_bind
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/pgdata

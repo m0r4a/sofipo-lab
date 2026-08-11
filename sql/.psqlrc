@@ -1,0 +1,20 @@
+-- .psqlrc del laboratorio SOFIPO. Se aplica en `just psql`.
+-- Los atajos :pr, :sig y :lento dependen del esquema lab (se crea en el seed).
+
+\set QUIET 1
+\timing on
+\pset null '∅'
+\set COMP_KEYWORD_CASE upper
+
+-- Prompt claro: usuario@base y número de sentencia.
+\set PROMPT1 '%n@%/ %R%# '
+
+-- Atajos. Se usan escribiendo, por ejemplo, `:pr` y Enter.
+\set pr 'SELECT * FROM lab.progreso();'
+\set sig 'SELECT * FROM lab.siguiente();'
+\set lento 'SELECT round(total_exec_time::numeric,1) AS ms_total, calls, left(regexp_replace(query, ''\\s+'', '' '', ''g''), 80) AS consulta FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 15;'
+
+\set QUIET 0
+\echo 'Laboratorio SOFIPO. Atajos: :pr (progreso)  :sig (siguiente ejercicio)  :lento (top consultas)'
+\echo 'Ayuda de psql: \\? (meta-comandos)  \\d (objetos)  \\d+ tabla (detalle con comentarios)'
+\echo 'Conceptos de negocio: docs/glosario-financiero.md (en la terminal: just glosario <término>)'
